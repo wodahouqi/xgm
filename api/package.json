@@ -1,0 +1,57 @@
+{
+  "name": "artwork-booking-api",
+  "version": "1.0.0",
+  "description": "Artwork Booking System Backend API",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "db:init": "ts-node src/scripts/initDb.ts",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "typeorm": "typeorm-ts-node-commonjs"
+  },
+  "keywords": ["artwork", "booking", "api", "spring-boot", "mysql"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "mysql2": "^3.6.0",
+    "typeorm": "^0.3.17",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "joi": "^17.9.2",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^6.8.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/cors": "^2.8.13",
+    "@types/morgan": "^1.9.4",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/multer": "^1.4.7",
+    "@types/compression": "^1.7.2",
+    "@types/uuid": "^9.0.2",
+    "@types/node": "^20.4.2",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "eslint": "^8.45.0",
+    "jest": "^29.6.1",
+    "@types/jest": "^29.5.3",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

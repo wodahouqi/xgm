@@ -1,0 +1,49 @@
+server {
+  listen 80;
+  server_name __DOMAIN__;
+
+  root __FRONTEND_ROOT__;
+  index index.html;
+
+  gzip on;
+  gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+
+  # 轻量服务器：为静态资源开启较长缓存
+  location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|webp)$ {
+    expires 7d;
+    add_header Cache-Control "public, max-age=604800";
+    try_files $uri =404;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  # 反向代理后端 API（本地监听 3000）
+  location /api/ {
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_pass http://127.0.0.1:__API_PORT__/api/;
+  }
+
+  # 反向代理后端静态上传目录
+  location /uploads/ {
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_pass http://127.0.0.1:__API_PORT__/uploads/;
+  }
+}
