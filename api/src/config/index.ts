@@ -11,7 +11,7 @@ export const config = {
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT || '3306'),
     username: process.env.DB_USERNAME || 'root',
-    password: process.env.DB_PASSWORD || 'root',
+    password: process.env.DB_PASSWORD || 'Shcytech@123456',
     database: process.env.DB_DATABASE || 'artwork_booking',
     synchronize: process.env.DB_SYNC === 'true',
     logging: process.env.NODE_ENV === 'development'
