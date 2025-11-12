@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: false,
     minify: 'esbuild',
+    reportCompressedSize: false,
   },
   resolve: {
     conditions: mode === 'development' ? ['development', 'browser', 'module'] : ['production', 'browser', 'module'],
