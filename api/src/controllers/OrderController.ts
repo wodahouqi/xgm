@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { AppDataSource } from '../config/database'
-import { Order } from '../entities/Order'
+import { Order, OrderStatus, PaymentStatus } from '../entities/Order'
 import { OrderItem } from '../entities/OrderItem'
 import { Artwork } from '../entities/Artwork'
 import { User } from '../entities/User'
@@ -47,7 +47,7 @@ export class OrderController {
   getUserOrders = async (req: Request, res: Response) => {
     try {
       const { page = 1, limit = 10 } = req.query
-      const userId = req.user?.id
+      const userId = (req as any).user?.id
 
       if (!userId) {
         return sendError(res, 'User not authenticated', 401)
@@ -79,7 +79,7 @@ export class OrderController {
   getOrderById = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      const userId = req.user?.id
+      const userId = (req as any).user?.id
 
       if (!userId) {
         return sendError(res, 'User not authenticated', 401)
@@ -98,7 +98,7 @@ export class OrderController {
       }
 
       // Check if user owns the order or is admin
-      if (order.userId !== userId && req.user?.role !== 'admin') {
+      if (order.userId !== userId && (req as any).user?.role !== 'admin') {
         return sendError(res, 'Access denied', 403)
       }
 
@@ -112,7 +112,7 @@ export class OrderController {
   createOrder = async (req: Request, res: Response) => {
     try {
       const { items, notes } = req.body
-      const userId = req.user?.id
+      const userId = (req as any).user?.id
 
       if (!userId) {
         return sendError(res, 'User not authenticated', 401)
@@ -158,11 +158,13 @@ export class OrderController {
         userId,
         orderNumber: generateOrderNumber(),
         totalAmount,
-        status: 'pending',
-        notes
+        status: OrderStatus.PENDING,
+        paymentStatus: PaymentStatus.PENDING,
+        finalAmount: totalAmount,
+        notes,
       })
 
-      const savedOrder = await orderRepository.save(order)
+      const savedOrder: Order = await orderRepository.save(order)
 
       // Create order items
       for (const itemData of orderItems) {
@@ -199,8 +201,15 @@ export class OrderController {
         return sendError(res, 'Status is required', 400)
       }
 
-      const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
-      if (!validStatuses.includes(status)) {
+      const validStatuses: OrderStatus[] = [
+        OrderStatus.PENDING,
+        OrderStatus.CONFIRMED,
+        OrderStatus.PROCESSING,
+        OrderStatus.SHIPPED,
+        OrderStatus.DELIVERED,
+        OrderStatus.CANCELLED,
+      ]
+      if (!validStatuses.includes(status as OrderStatus)) {
         return sendError(res, 'Invalid status', 400)
       }
 
@@ -211,7 +220,7 @@ export class OrderController {
         return sendError(res, 'Order not found', 404)
       }
 
-      order.status = status
+      order.status = status as OrderStatus
       order.updatedAt = new Date()
 
       const updatedOrder = await orderRepository.save(order)
@@ -232,8 +241,13 @@ export class OrderController {
         return sendError(res, 'Payment status is required', 400)
       }
 
-      const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded']
-      if (!validPaymentStatuses.includes(paymentStatus)) {
+      const validPaymentStatuses: PaymentStatus[] = [
+        PaymentStatus.PENDING,
+        PaymentStatus.PAID,
+        PaymentStatus.FAILED,
+        PaymentStatus.REFUNDED,
+      ]
+      if (!validPaymentStatuses.includes(paymentStatus as PaymentStatus)) {
         return sendError(res, 'Invalid payment status', 400)
       }
 
@@ -244,9 +258,9 @@ export class OrderController {
         return sendError(res, 'Order not found', 404)
       }
 
-      order.paymentStatus = paymentStatus
+      order.paymentStatus = paymentStatus as PaymentStatus
       if (paymentMethod) order.paymentMethod = paymentMethod
-      if (transactionId) order.transactionId = transactionId
+      if (transactionId) order.paymentId = transactionId
       order.updatedAt = new Date()
 
       const updatedOrder = await orderRepository.save(order)
@@ -261,7 +275,7 @@ export class OrderController {
   cancelOrder = async (req: Request, res: Response) => {
     try {
       const { id } = req.params
-      const userId = req.user?.id
+      const userId = (req as any).user?.id
 
       if (!userId) {
         return sendError(res, 'User not authenticated', 401)
@@ -275,16 +289,16 @@ export class OrderController {
       }
 
       // Check if user owns the order or is admin
-      if (order.userId !== userId && req.user?.role !== 'admin') {
+      if (order.userId !== userId && (req as any).user?.role !== 'admin') {
         return sendError(res, 'Access denied', 403)
       }
 
       // Check if order can be cancelled
-      if (!['pending', 'confirmed'].includes(order.status)) {
+      if (![OrderStatus.PENDING, OrderStatus.CONFIRMED].includes(order.status)) {
         return sendError(res, 'Order cannot be cancelled at this stage', 400)
       }
 
-      order.status = 'cancelled'
+      order.status = OrderStatus.CANCELLED
       order.updatedAt = new Date()
 
       const updatedOrder = await orderRepository.save(order)

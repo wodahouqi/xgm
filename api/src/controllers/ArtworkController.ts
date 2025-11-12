@@ -379,24 +379,27 @@ export class ArtworkController {
       }
 
       // Create artwork
-      const artwork = artworkRepository.create({
-        title,
-        description,
-        imageUrl,
-        additionalImages,
-        type: type || ArtworkType.PAINTING,
-        // Ensure numeric types
+      const artworkData: Partial<Artwork> = {
+        title: String(title),
+        description: description ? String(description) : null as any,
+        imageUrl: String(imageUrl),
+        additionalImages: Array.isArray(additionalImages) ? JSON.stringify(additionalImages) : (additionalImages ?? ''),
+        type: (Object.values(ArtworkType) as string[]).includes(String(type)) ? (String(type) as ArtworkType) : ArtworkType.PAINTING,
         price: Number(price),
         stock: Number(stock),
-        width,
-        height,
-        depth,
-        unit,
-        materials,
-        year,
+        width: width !== undefined ? Number(width) as any : undefined,
+        height: height !== undefined ? Number(height) as any : undefined,
+        depth: depth !== undefined ? Number(depth) as any : undefined,
+        unit: unit ? String(unit) : undefined,
+        materials: materials ? String(materials) : undefined,
+        year: year !== undefined ? Number(year) : undefined,
         categoryId: normalizedCategoryId || null,
-        artistId: normalizedArtistId || null
-      })
+        artistId: normalizedArtistId || null,
+        isActive: true,
+        status: ArtworkStatus.AVAILABLE,
+      }
+
+      const artwork = artworkRepository.create(artworkData)
 
       const savedArtwork = await artworkRepository.save(artwork)
 

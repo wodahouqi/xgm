@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { MoreThanOrEqual } from 'typeorm'
 import { AppDataSource } from '../config/database'
 import { Order } from '../entities/Order'
 import { OrderItem } from '../entities/OrderItem'
@@ -211,7 +212,7 @@ export class DashboardController {
 
   getArtistDashboard = async (req: Request, res: Response) => {
     try {
-      const artistId = req.user?.id
+      const artistId = (req as any).user?.id
 
       if (!artistId) {
         return sendError(res, 'Artist not authenticated', 401)
@@ -309,9 +310,9 @@ export class DashboardController {
       const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
       // Get order statistics
-      const todayOrders = await orderRepository.count({ where: { createdAt: { $gte: today } } })
-      const weekOrders = await orderRepository.count({ where: { createdAt: { $gte: thisWeek } } })
-      const monthOrders = await orderRepository.count({ where: { createdAt: { $gte: thisMonth } } })
+      const todayOrders = await orderRepository.count({ where: { createdAt: MoreThanOrEqual(today) } })
+      const weekOrders = await orderRepository.count({ where: { createdAt: MoreThanOrEqual(thisWeek) } })
+      const monthOrders = await orderRepository.count({ where: { createdAt: MoreThanOrEqual(thisMonth) } })
 
       // Get revenue statistics
       const todayRevenue = await orderRepository
@@ -336,14 +337,14 @@ export class DashboardController {
         .getRawOne()
 
       // Get user statistics
-      const todayUsers = await userRepository.count({ where: { createdAt: { $gte: today } } })
-      const weekUsers = await userRepository.count({ where: { createdAt: { $gte: thisWeek } } })
-      const monthUsers = await userRepository.count({ where: { createdAt: { $gte: thisMonth } } })
+      const todayUsers = await userRepository.count({ where: { createdAt: MoreThanOrEqual(today) } })
+      const weekUsers = await userRepository.count({ where: { createdAt: MoreThanOrEqual(thisWeek) } })
+      const monthUsers = await userRepository.count({ where: { createdAt: MoreThanOrEqual(thisMonth) } })
 
       // Get artwork statistics
-      const todayArtworks = await artworkRepository.count({ where: { createdAt: { $gte: today } } })
-      const weekArtworks = await artworkRepository.count({ where: { createdAt: { $gte: thisWeek } } })
-      const monthArtworks = await artworkRepository.count({ where: { createdAt: { $gte: thisMonth } } })
+      const todayArtworks = await artworkRepository.count({ where: { createdAt: MoreThanOrEqual(today) } })
+      const weekArtworks = await artworkRepository.count({ where: { createdAt: MoreThanOrEqual(thisWeek) } })
+      const monthArtworks = await artworkRepository.count({ where: { createdAt: MoreThanOrEqual(thisMonth) } })
 
       const stats = {
         orders: {

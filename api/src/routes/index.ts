@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Router as ExpressRouter } from 'express'
 import userRoutes from './userRoutes'
 import artworkRoutes from './artworkRoutes'
 import artistRoutes from './artistRoutes'
@@ -7,7 +7,7 @@ import orderRoutes from './orderRoutes'
 import uploadRoutes from './uploadRoutes'
 import dashboardRoutes from './dashboardRoutes'
 
-const router = Router()
+const router: ExpressRouter = Router()
 
 // Mount all route modules
 router.use('/users', userRoutes)

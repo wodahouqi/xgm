@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import jwt, { Secret } from 'jsonwebtoken'
+import jwt, { Secret, SignOptions } from 'jsonwebtoken'
 import { config } from '../config'
 import { User } from '../entities/User'
 
@@ -14,16 +14,14 @@ export const comparePassword = async (password: string, hashedPassword: string):
 
 export const generateToken = (userId: string): string => {
   const secret: Secret = config.jwt.secret as Secret
-  return jwt.sign({ userId }, secret, {
-    expiresIn: config.jwt.expiresIn
-  })
+  const options: SignOptions = { expiresIn: config.jwt.expiresIn as any }
+  return jwt.sign({ userId }, secret, options)
 }
 
 export const generateRefreshToken = (userId: string): string => {
   const secret: Secret = config.jwt.secret as Secret
-  return jwt.sign({ userId, type: 'refresh' }, secret, {
-    expiresIn: '30d'
-  })
+  const options: SignOptions = { expiresIn: '30d' }
+  return jwt.sign({ userId, type: 'refresh' }, secret, options)
 }
 
 export const verifyToken = (token: string): any => {

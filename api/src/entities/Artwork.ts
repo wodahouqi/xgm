@@ -104,14 +104,14 @@ export class Artwork {
   category: Category
 
   @Column({ nullable: true })
-  categoryId: string
+  categoryId: string | null
 
   @ManyToOne(() => Artist, artist => artist.artworks)
   @JoinColumn({ name: 'artistId' })
   artist: Artist
 
   @Column({ nullable: true })
-  artistId: string
+  artistId: string | null
 
   @OneToMany(() => OrderItem, orderItem => orderItem.artwork)
   orderItems: OrderItem[]

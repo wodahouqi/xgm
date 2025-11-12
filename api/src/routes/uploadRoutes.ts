@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Router as ExpressRouter } from 'express'
 import multer from 'multer'
 import { FileUploadController } from '../controllers/FileUploadController'
 import { authMiddleware } from '../middleware/auth'
@@ -6,7 +6,7 @@ import { roleMiddleware } from '../middleware/role'
 import { UserRole } from '../entities/User'
 import { config } from '../config'
 
-const router = Router()
+const router: ExpressRouter = Router()
 const fileUploadController = new FileUploadController()
 
 // Configure multer for file uploads
