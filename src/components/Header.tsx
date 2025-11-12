@@ -8,6 +8,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { currentUser, cart, isAuthenticated, setCurrentUser } = useStore()
   const navigate = useNavigate()
+  const logoUrl = (import.meta as any).env?.VITE_LOGO_URL || '/logo.png'
 
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0)
 
@@ -26,9 +27,15 @@ export default function Header() {
         <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs sm:text-sm">艺</span>
-            </div>
+            <img
+              src={logoUrl}
+              alt="Logo"
+              className="h-6 sm:h-8 w-auto object-contain"
+              onError={(e) => {
+                const img = e.currentTarget as HTMLImageElement
+                img.src = '/favicon.svg'
+              }}
+            />
             <span className="text-lg sm:text-xl font-bold text-gray-900">艺术品预订</span>
           </Link>
 

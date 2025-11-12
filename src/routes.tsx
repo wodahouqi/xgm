@@ -25,6 +25,7 @@ const ArtistOrders = lazy(() => import('./pages/artist/Orders'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AdminUsers = lazy(() => import('./pages/admin/Users'))
 const AdminArtworks = lazy(() => import('./pages/admin/Artworks'))
+const AdminArtists = lazy(() => import('./pages/admin/Artists'))
 const AdminOrders = lazy(() => import('./pages/admin/Orders'))
 const AdminAnalytics = lazy(() => import('./pages/admin/Analytics'))
 const AdminCategories = lazy(() => import('./pages/admin/Categories'))
@@ -147,6 +148,10 @@ const router = createBrowserRouter([
           {
             path: '/admin-dashboard/users',
             element: <AdminUsers />
+          },
+          {
+            path: '/admin-dashboard/artists',
+            element: <AdminArtists />
           },
           {
             path: '/admin-dashboard/artworks',

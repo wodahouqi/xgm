@@ -10,7 +10,8 @@ import {
   TrendingUp,
   AlertCircle,
   CheckCircle,
-  Tag
+  Tag,
+  Award
 } from 'lucide-react'
 import { cn } from '@/utils'
 
@@ -37,6 +38,12 @@ export default function AdminDashboard() {
       label: '用户管理', 
       icon: Users,
       path: '/admin-dashboard/users'
+    },
+    { 
+      id: 'artists', 
+      label: '艺术家管理', 
+      icon: Award,
+      path: '/admin-dashboard/artists'
     },
     { 
       id: 'artworks', 

@@ -304,6 +304,55 @@ export const api = {
   }),
   adminDeleteArtwork: (id: string) => request<null>(`/artworks/${id}`, { method: 'DELETE' }),
 
+  adminArtists: (params?: { page?: number; limit?: number; status?: 'active' | 'inactive' | 'pending'; search?: string }) => {
+    const ps = new URLSearchParams()
+    if (params?.page) ps.set('page', String(params.page))
+    if (params?.limit) ps.set('limit', String(params.limit))
+    if (params?.status) ps.set('status', params.status)
+    if (params?.search) ps.set('search', params.search)
+    const qs = ps.toString() ? `?${ps.toString()}` : ''
+    return requestFull<ApiArtist[]>(`/artists${qs}`)
+  },
+  createArtist: (payload: {
+    name: string
+    bio?: string
+    avatar?: string
+    studio?: string
+    location?: string
+    specialties?: string
+    yearsOfExperience?: number
+    education?: string
+    awards?: string
+    status?: 'active' | 'inactive' | 'pending'
+    isActive?: boolean
+    userId?: string
+  }) => request<ApiArtist>('/artists', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  updateArtist: (id: string, payload: {
+    name?: string
+    bio?: string
+    avatar?: string
+    studio?: string
+    location?: string
+    specialties?: string
+    yearsOfExperience?: number
+    education?: string
+    awards?: string
+    status?: 'active' | 'inactive' | 'pending'
+    isActive?: boolean
+    userId?: string
+  }) => request<ApiArtist>(`/artists/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  }),
+  deleteArtist: (id: string) => request<null>(`/artists/${id}`, { method: 'DELETE' }),
+  updateArtistStatus: (id: string, status: 'active' | 'inactive' | 'pending') => request<ApiArtist>(`/artists/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  }),
+
   // Uploads
   uploadImage: async (file: File): Promise<{ url: string; filename: string }> => {
     const form = new FormData()
