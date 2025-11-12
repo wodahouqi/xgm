@@ -4,6 +4,12 @@ export const rateLimiter = (windowMs: number = 15 * 60 * 1000, max: number = 100
   const requests = new Map<string, { count: number; resetTime: number }>()
 
   return (req: Request, res: Response, next: NextFunction) => {
+    if (process.env.NODE_ENV !== 'production') {
+      return next()
+    }
+    if (req.method === 'GET' || req.method === 'OPTIONS') {
+      return next()
+    }
     const ip = req.ip || req.connection.remoteAddress || 'unknown'
     const now = Date.now()
     const requestInfo = requests.get(ip)

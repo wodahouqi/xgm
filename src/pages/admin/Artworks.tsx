@@ -29,12 +29,7 @@ export default function AdminArtworks() {
   const [uploadedMain, setUploadedMain] = useState<File | null>(null)
   const [uploadedGallery, setUploadedGallery] = useState<File[]>([])
   const [artistOptions, setArtistOptions] = useState<ApiArtist[]>([])
-
-  const categoryOptions = useMemo(() => {
-    const map = new Map<string, string>()
-    artworks.forEach(a => { if (a.category?.id && a.category?.name) map.set(a.category.id, a.category.name) })
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
-  }, [artworks])
+  const [categoryOptions, setCategoryOptions] = useState<{ id: string; name: string }[]>([])
 
   const statusLabels: Record<'available' | 'reserved' | 'sold' | 'hidden', string> = {
     available: '在售',
@@ -81,6 +76,15 @@ export default function AdminArtworks() {
       } catch (e) {
         console.warn('加载艺术家列表失败', e)
       }
+    })()
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const categories = await api.categories(50)
+        setCategoryOptions(categories.map(c => ({ id: c.id, name: c.name })))
+      } catch {}
     })()
   }, [])
 

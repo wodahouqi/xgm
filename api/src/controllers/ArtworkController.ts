@@ -26,6 +26,111 @@ export class ArtworkController {
         search 
       } = req.query
 
+      if (!AppDataSource.isInitialized) {
+        const base = [
+          {
+            id: 'art-mock-1',
+            title: '山水意境',
+            description: '开发环境示例作品',
+            imageUrl: 'https://picsum.photos/seed/art-m1/800/800',
+            additionalImages: JSON.stringify(['https://picsum.photos/seed/art-m1b/800/800']),
+            type: 'painting',
+            price: 1280,
+            stock: 3,
+            width: 60,
+            height: 80,
+            unit: 'cm',
+            materials: '油画布',
+            year: new Date().getFullYear(),
+            status: ArtworkStatus.AVAILABLE,
+            isActive: true,
+            isFeatured: true,
+            viewCount: 12,
+            rating: 4.5,
+            reviewCount: 3,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            category: { id: 'cat-mock-1', name: '绘画' },
+            artist: { id: 'artist-mock-1', name: '张三' }
+          },
+          {
+            id: 'art-mock-2',
+            title: '现代雕塑',
+            description: '开发环境示例作品',
+            imageUrl: 'https://picsum.photos/seed/art-m2/800/800',
+            additionalImages: JSON.stringify([]),
+            type: 'sculpture',
+            price: 2560,
+            stock: 1,
+            width: 30,
+            height: 50,
+            depth: 30,
+            unit: 'cm',
+            materials: '石膏',
+            year: new Date().getFullYear(),
+            status: ArtworkStatus.AVAILABLE,
+            isActive: true,
+            isFeatured: false,
+            viewCount: 5,
+            rating: 4.0,
+            reviewCount: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            category: { id: 'cat-mock-2', name: '雕塑' },
+            artist: { id: 'artist-mock-2', name: '李四' }
+          },
+          {
+            id: 'art-mock-3',
+            title: '数字光影',
+            description: '开发环境示例作品',
+            imageUrl: 'https://picsum.photos/seed/art-m3/800/800',
+            additionalImages: JSON.stringify([]),
+            type: 'digital',
+            price: 680,
+            stock: 10,
+            width: 1920,
+            height: 1080,
+            unit: 'px',
+            materials: '数字艺术',
+            year: new Date().getFullYear(),
+            status: ArtworkStatus.AVAILABLE,
+            isActive: true,
+            isFeatured: false,
+            viewCount: 20,
+            rating: 4.8,
+            reviewCount: 5,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            category: { id: 'cat-mock-3', name: '数字艺术' },
+            artist: { id: 'artist-mock-3', name: '王五' }
+          }
+        ]
+        let filtered = base
+        if (status) filtered = filtered.filter(a => String(a.status) === String(status))
+        if (category) filtered = filtered.filter(a => String(a.category?.id) === String(category))
+        if (artist) filtered = filtered.filter(a => String(a.artist?.id) === String(artist))
+        if (type) filtered = filtered.filter(a => String(a.type) === String(type))
+        if (minPrice) filtered = filtered.filter(a => Number(a.price) >= Number(minPrice))
+        if (maxPrice) filtered = filtered.filter(a => Number(a.price) <= Number(maxPrice))
+        if (search) {
+          const s = String(search).toLowerCase()
+          filtered = filtered.filter(a => a.title.toLowerCase().includes(s) || (a.description || '').toLowerCase().includes(s))
+        }
+        const validSortFields = ['title', 'price', 'createdAt', 'viewCount', 'rating']
+        const sortField = validSortFields.includes(String(sortBy)) ? String(sortBy) : 'createdAt'
+        const dir = String(sortOrder) === 'ASC' ? 1 : -1
+        filtered = filtered.sort((a: any, b: any) => {
+          const av = a[sortField]
+          const bv = b[sortField]
+          return av > bv ? dir : av < bv ? -dir : 0
+        })
+        const p = Number(page) || 1
+        const l = Number(limit) || 12
+        const start = (p - 1) * l
+        const data = filtered.slice(start, start + l)
+        return sendSuccess(res, data, 'Artworks retrieved successfully', formatPagination(p, l, filtered.length))
+      }
+
       const artworkRepository = AppDataSource.getRepository(Artwork)
       const queryBuilder = artworkRepository.createQueryBuilder('artwork')
         .leftJoinAndSelect('artwork.category', 'category')

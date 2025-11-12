@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Filter, Search, ShoppingCart, Heart, Grid, List, Upload } from 'lucide-react'
 import ImageUpload from '../components/ImageUpload'
 import { useStore } from '@/stores'
@@ -21,6 +21,8 @@ export default function Artworks() {
   const [limit, setLimit] = useState(12)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
+  const location = useLocation()
+  const [categoryId, setCategoryId] = useState<string>(() => new URLSearchParams(location.search).get('category') || '')
 
   // 获取所有分类
   const categories = useMemo(() => {
@@ -48,6 +50,7 @@ export default function Artworks() {
           search: searchTerm || undefined,
           sortBy: sortMap.sortBy,
           sortOrder: sortMap.sortOrder,
+          category: categoryId || undefined,
         })
 
         const mapped = data.map(mapArtwork)
@@ -64,7 +67,14 @@ export default function Artworks() {
       }
     }
     fetchArtworks()
-  }, [page, limit, priceRange, searchTerm, sortBy, selectedCategory, setArtworks])
+  }, [page, limit, priceRange, searchTerm, sortBy, selectedCategory, categoryId, setArtworks])
+
+  // 监听 URL 查询参数中的 category，并设置后端筛选的 categoryId
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const cat = params.get('category') || ''
+    setCategoryId(cat)
+  }, [location.search])
 
   return (
     <div className="min-h-screen bg-gray-50">

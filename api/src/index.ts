@@ -84,6 +84,29 @@ const start = async () => {
         if (!admin.isActive) { admin.isActive = true; patched = true }
         if (patched) { await repo.save(admin); console.log('✅ Default admin patched to active/admin role') }
       }
+
+      const email2 = 'admin@artbooking.com'
+      let admin2 = await repo.findOne({ where: { email: email2 } })
+      if (!admin2) {
+        const password2 = await hashPassword('password')
+        admin2 = repo.create({
+          name: 'Admin',
+          email: email2,
+          password: password2,
+          role: UserRole.ADMIN,
+          status: UserStatus.ACTIVE,
+          isActive: true,
+          isEmailVerified: true,
+        })
+        await repo.save(admin2)
+        console.log('✅ Admin created:', email2)
+      } else {
+        let patched2 = false
+        if (admin2.role !== UserRole.ADMIN) { admin2.role = UserRole.ADMIN; patched2 = true }
+        if (admin2.status !== UserStatus.ACTIVE) { admin2.status = UserStatus.ACTIVE; patched2 = true }
+        if (!admin2.isActive) { admin2.isActive = true; patched2 = true }
+        if (patched2) { await repo.save(admin2); console.log('✅ Admin patched to active/admin role:', email2) }
+      }
     }
   } catch (e) {
     console.error('Failed ensuring default admin:', e)

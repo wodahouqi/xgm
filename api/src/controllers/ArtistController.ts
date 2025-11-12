@@ -11,6 +11,24 @@ export class ArtistController {
       // Do not force default status filter; only apply if provided
       const { page = 1, limit = 12, status, search } = req.query
 
+      if (!AppDataSource.isInitialized) {
+        const base = [
+          { id: 'artist-mock-1', name: '张三', bio: '擅长油画', avatar: 'https://picsum.photos/seed/artist-m1/300/300', studio: '海淀工作室', location: '北京', specialties: '油画', status: 'active', isActive: true, totalArtworks: 3, totalSales: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+          { id: 'artist-mock-2', name: '李四', bio: '雕塑艺术家', avatar: 'https://picsum.photos/seed/artist-m2/300/300', studio: '浦东工坊', location: '上海', specialties: '雕塑', status: 'active', isActive: true, totalArtworks: 2, totalSales: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+          { id: 'artist-mock-3', name: '王五', bio: '新锐数字艺术', avatar: 'https://picsum.photos/seed/artist-m3/300/300', studio: '天河工作室', location: '广州', specialties: '数字艺术', status: 'pending', isActive: true, totalArtworks: 1, totalSales: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+        ]
+        const f = base.filter(a => {
+          const okStatus = status ? String(a.status) === String(status) : true
+          const okSearch = search ? (a.name.toLowerCase().includes(String(search).toLowerCase()) || (a.bio || '').toLowerCase().includes(String(search).toLowerCase())) : true
+          return okStatus && okSearch
+        })
+        const p = Number(page) || 1
+        const l = Number(limit) || 12
+        const start = (p - 1) * l
+        const data = f.slice(start, start + l)
+        return sendSuccess(res, data, 'Artists retrieved successfully', formatPagination(p, l, f.length))
+      }
+
       const artistRepository = AppDataSource.getRepository(Artist)
       const queryBuilder = artistRepository.createQueryBuilder('artist')
         .where('artist.isActive = :isActive', { isActive: true })

@@ -23,9 +23,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (init && 'body' in init && init.body != null) {
     headers['Content-Type'] = 'application/json'
   }
+  const mergedHeaders = withAuthHeaders({ ...headers, ...(init?.headers as any) })
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: withAuthHeaders(headers),
     ...init,
+    headers: mergedHeaders,
   })
   if (!res.ok) {
     try {
@@ -46,9 +47,10 @@ async function requestFull<T>(path: string, init?: RequestInit): Promise<{ data:
   if (init && 'body' in init && init.body != null) {
     headers['Content-Type'] = 'application/json'
   }
+  const mergedHeaders = withAuthHeaders({ ...headers, ...(init?.headers as any) })
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: withAuthHeaders(headers),
     ...init,
+    headers: mergedHeaders,
   })
   if (!res.ok) {
     try {
