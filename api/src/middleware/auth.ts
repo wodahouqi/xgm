@@ -4,8 +4,10 @@ import { config } from '../config'
 import { AppDataSource } from '../config/database'
 import { User, UserRole, UserStatus } from '../entities/User'
 
+type AuthUser = Pick<User, 'id' | 'name' | 'email' | 'role' | 'status' | 'isActive'>
+
 export interface AuthRequest extends Request {
-  user?: User
+  user?: AuthUser
 }
 
 export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -20,7 +22,7 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
     }
 
     const decoded = jwt.verify(token, config.jwt.secret) as any
-    let user: User | null = null
+    let user: AuthUser | null = null
     if (AppDataSource.isInitialized) {
       const userRepository = AppDataSource.getRepository(User)
       user = await userRepository.findOne({ 
@@ -40,17 +42,6 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
           role: UserRole.ADMIN,
           status: UserStatus.ACTIVE,
           isActive: true,
-          phone: '',
-          location: '',
-          avatar: null as any,
-          bio: null as any,
-          isEmailVerified: true,
-          createdAt: new Date() as any,
-          updatedAt: new Date() as any,
-          artworks: [] as any,
-          orders: [] as any,
-          favorites: [] as any,
-          reviews: [] as any,
         }
       }
     }
