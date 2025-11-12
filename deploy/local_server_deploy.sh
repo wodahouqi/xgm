@@ -78,6 +78,7 @@ JWT_SECRET=change-me-in-prod
 PORT=$API_PORT
 NODE_ENV=production
 FRONTEND_URL=https://$DOMAIN
+UPLOAD_MAX_FILE_SIZE_MB=20
 EOF
 
 echo "[INIT] ensure logs directory exists"
@@ -102,6 +103,7 @@ server {
   ssl_certificate_key $SSL_KEY_PATH;
   ssl_protocols TLSv1.2 TLSv1.3;
   ssl_prefer_server_ciphers on;
+  client_max_body_size 20M;
 
   root $REMOTE_ROOT/frontend;
   index index.html;

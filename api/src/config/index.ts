@@ -26,7 +26,7 @@ export const config = {
   },
 
   upload: {
-    maxFileSize: 10 * 1024 * 1024, // 10MB
+    maxFileSize: (parseInt(process.env.UPLOAD_MAX_FILE_SIZE_MB || '20', 10)) * 1024 * 1024,
     allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
     uploadPath: path.join(__dirname, '../../uploads')
   },
