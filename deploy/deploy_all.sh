@@ -28,7 +28,7 @@ ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "sudo mkdir -p '$REMOTE_ROOT/deploy' '$
 scp -P "$SSH_PORT" "$DEPLOY_DIR/server_init.sh" "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/deploy/"
 scp -P "$SSH_PORT" "$DEPLOY_DIR/setup_ssl.sh" "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/deploy/"
 scp -P "$SSH_PORT" "$DEPLOY_DIR/db_init.sh" "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/deploy/"
-scp -P "$SSH_PORT" "$DEPLOY_DIR/ecosystem.config.js" "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/deploy/"
+scp -P "$SSH_PORT" "$DEPLOY_DIR/ecosystem.config.cjs" "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/deploy/"
 scp -P "$SSH_PORT" "$DEPLOY_DIR/nginx.conf.template" "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/deploy/"
 
 # 远端初始化（安装 Node/PM2/Nginx/Certbot）
@@ -47,7 +47,7 @@ scp -P "$SSH_PORT" "$DEPLOY_DIR/.env.server" "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/a
 
 # 使用 PM2 启动后端
 ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-  "APP_CWD='$REMOTE_ROOT/api' APP_LOG_OUT='$REMOTE_ROOT/logs/api-out.log' APP_LOG_ERR='$REMOTE_ROOT/logs/api-err.log' pm2 start '$REMOTE_ROOT/deploy/ecosystem.config.js' --update-env && pm2 save"
+  "APP_CWD='$REMOTE_ROOT/api' APP_LOG_OUT='$REMOTE_ROOT/logs/api-out.log' APP_LOG_ERR='$REMOTE_ROOT/logs/api-err.log' pm2 start '$REMOTE_ROOT/deploy/ecosystem.config.cjs' --update-env && pm2 save"
 
 # 构建并上传前端
 bash "$DEPLOY_DIR/frontend_deploy.sh"

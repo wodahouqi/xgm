@@ -162,7 +162,7 @@ sudo systemctl reload nginx || sudo service nginx reload || true
 
 echo "[PM2] start API"
 sudo npm i -g pm2 || true
-APP_CWD="$REMOTE_ROOT/api" APP_LOG_OUT="$REMOTE_ROOT/logs/api-out.log" APP_LOG_ERR="$REMOTE_ROOT/logs/api-err.log" pm2 start "$REMOTE_ROOT/deploy/ecosystem.config.js" --update-env
+APP_CWD="$REMOTE_ROOT/api" APP_LOG_OUT="$REMOTE_ROOT/logs/api-out.log" APP_LOG_ERR="$REMOTE_ROOT/logs/api-err.log" pm2 start "$REMOTE_ROOT/deploy/ecosystem.config.cjs" --update-env
 pm2 save
 pm2 status
 
