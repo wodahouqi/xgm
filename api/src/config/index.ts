@@ -13,10 +13,7 @@ export const config = {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || 'root',
     database: process.env.DB_DATABASE || 'artwork_booking',
-    // Disable TypeORM auto-synchronize to avoid startup failures when legacy
-    // sample data introduces duplicates or incompatible schema. Use initDb.ts
-    // for controlled migrations and patching instead.
-    synchronize: false,
+    synchronize: process.env.DB_SYNC === 'true',
     logging: process.env.NODE_ENV === 'development'
   },
 

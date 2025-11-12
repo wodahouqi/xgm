@@ -79,6 +79,7 @@ PORT=$API_PORT
 NODE_ENV=production
 FRONTEND_URL=https://$DOMAIN
 UPLOAD_MAX_FILE_SIZE_MB=20
+DB_SYNC=true
 EOF
 
 echo "[INIT] ensure logs directory exists"

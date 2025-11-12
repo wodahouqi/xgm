@@ -25,7 +25,7 @@ app.use(helmet({
   crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
 }))
 app.use(morgan('dev'))
-app.use(express.json({ limit: '2mb' }))
+app.use(express.json({ limit: `${process.env.BODY_LIMIT_MB || '10'}mb` }))
 app.use(express.urlencoded({ extended: true }))
 app.use(corsMiddleware)
 app.use(rateLimiter(config.rateLimit.windowMs, config.rateLimit.max))
