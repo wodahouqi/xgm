@@ -42,6 +42,8 @@ $API_PORT = $DEPLOY['API_PORT']
 $SITE_NAME = $DEPLOY['NGINX_SITE_NAME']
 $LOCAL_FRONTEND_BUILD_DIR = $DEPLOY['LOCAL_FRONTEND_BUILD_DIR']
 $LOCAL_BACKEND_DIR = $DEPLOY['LOCAL_BACKEND_DIR']
+$SSL_CERT_PATH = $DEPLOY['SSL_CERT_PATH']
+$SSL_KEY_PATH = $DEPLOY['SSL_KEY_PATH']
 
 if (-not (Test-Path "$LOCAL_FRONTEND_BUILD_DIR/index.html")) {
   Write-Host "[DEPLOY] Frontend not built. Running 'npm run build'..."
@@ -51,32 +53,32 @@ if (-not (Test-Path "$LOCAL_FRONTEND_BUILD_DIR/index.html")) {
 Write-Host "[DEPLOY] Target: $($SSH_USER)@$($SSH_HOST):$SSH_PORT, root: $REMOTE_ROOT, domain: $DOMAIN"
 
 Write-Host "[DEPLOY] Creating remote directories..."
-ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "sudo mkdir -p '$REMOTE_ROOT/deploy' '$REMOTE_ROOT/frontend' '$REMOTE_ROOT/api' '$REMOTE_ROOT/logs'" | Write-Host
+ssh -o StrictHostKeyChecking=no -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "sudo mkdir -p '$REMOTE_ROOT/deploy' '$REMOTE_ROOT/frontend' '$REMOTE_ROOT/api' '$REMOTE_ROOT/logs'" | Write-Host
 
 Write-Host "[DEPLOY] Uploading helper files..."
-scp -P $SSH_PORT "$PSScriptRoot/server_init.sh" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
-scp -P $SSH_PORT "$PSScriptRoot/setup_ssl.sh" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
-scp -P $SSH_PORT "$PSScriptRoot/db_init.sh" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
-scp -P $SSH_PORT "$PSScriptRoot/ecosystem.config.js" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
-scp -P $SSH_PORT "$PSScriptRoot/nginx.conf.template" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
+scp -o StrictHostKeyChecking=no -P $SSH_PORT "$PSScriptRoot/server_init.sh" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
+scp -o StrictHostKeyChecking=no -P $SSH_PORT "$PSScriptRoot/setup_ssl.sh" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
+scp -o StrictHostKeyChecking=no -P $SSH_PORT "$PSScriptRoot/db_init.sh" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
+scp -o StrictHostKeyChecking=no -P $SSH_PORT "$PSScriptRoot/ecosystem.config.js" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
+scp -o StrictHostKeyChecking=no -P $SSH_PORT "$PSScriptRoot/nginx.conf.template" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/deploy/"
 
 Write-Host "[INIT] Remote server initialization..."
-ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "DOMAIN='$DOMAIN' ENABLE_SSL='$ENABLE_SSL' REMOTE_ROOT='$REMOTE_ROOT' API_PORT='$API_PORT' bash '$REMOTE_ROOT/deploy/server_init.sh'"
+ssh -o StrictHostKeyChecking=no -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "DOMAIN='$DOMAIN' ENABLE_SSL='$ENABLE_SSL' REMOTE_ROOT='$REMOTE_ROOT' API_PORT='$API_PORT' bash '$REMOTE_ROOT/deploy/server_init.sh'"
 
 Write-Host "[BACKEND] Uploading backend directory..."
-scp -P $SSH_PORT -r "$LOCAL_BACKEND_DIR" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/"
+scp -o StrictHostKeyChecking=no -P $SSH_PORT -r "$LOCAL_BACKEND_DIR" "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/"
 
 Write-Host "[BACKEND] Uploading backend .env..."
-scp -P $SSH_PORT $EnvServerPath "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/api/.env"
+scp -o StrictHostKeyChecking=no -P $SSH_PORT $EnvServerPath "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/api/.env"
 
 Write-Host "[BACKEND] Installing deps and building on remote..."
 ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "cd '$REMOTE_ROOT/api' && npm ci && npm run -s build"
 
 Write-Host "[BACKEND] Starting API with PM2..."
-ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "APP_CWD='$REMOTE_ROOT/api' APP_LOG_OUT='$REMOTE_ROOT/logs/api-out.log' APP_LOG_ERR='$REMOTE_ROOT/logs/api-err.log' pm2 start '$REMOTE_ROOT/deploy/ecosystem.config.js' --update-env && pm2 save"
+ssh -o StrictHostKeyChecking=no -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "APP_CWD='$REMOTE_ROOT/api' APP_LOG_OUT='$REMOTE_ROOT/logs/api-out.log' APP_LOG_ERR='$REMOTE_ROOT/logs/api-err.log' pm2 start '$REMOTE_ROOT/deploy/ecosystem.config.js' --update-env && pm2 save"
 
 Write-Host "[FRONTEND] Uploading dist..."
-ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "sudo mkdir -p '$REMOTE_ROOT/frontend' && sudo rm -rf '$REMOTE_ROOT/frontend/'*"
+ssh -o StrictHostKeyChecking=no -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "sudo mkdir -p '$REMOTE_ROOT/frontend' && sudo rm -rf '$REMOTE_ROOT/frontend/'*"
 # Copy all files from local dist to remote frontend directory
 $root = (Resolve-Path "$LOCAL_FRONTEND_BUILD_DIR").Path
 Get-ChildItem -Path $root -Recurse | ForEach-Object {
@@ -87,12 +89,12 @@ Get-ChildItem -Path $root -Recurse | ForEach-Object {
   if ($_.PSIsContainer) {
     ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "mkdir -p '$REMOTE_ROOT/frontend/$relUnix'" | Out-Null
   } else {
-    scp -P $SSH_PORT $full "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/frontend/$relUnix"
+    scp -o StrictHostKeyChecking=no -P $SSH_PORT $full "$($SSH_USER)@$($SSH_HOST):$REMOTE_ROOT/frontend/$relUnix"
   }
 }
 
 Write-Host "[NGINX] Configuring and reloading..."
-ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "sudo bash -lc 'sed -e s#__DOMAIN__#${DOMAIN}#g -e s#__FRONTEND_ROOT__#${REMOTE_ROOT}/frontend#g -e s#__API_PORT__#${API_PORT}#g ${REMOTE_ROOT}/deploy/nginx.conf.template > /etc/nginx/sites-available/${SITE_NAME}.conf && ln -sf /etc/nginx/sites-available/${SITE_NAME}.conf /etc/nginx/sites-enabled/${SITE_NAME}.conf && nginx -t && (systemctl reload nginx || service nginx reload)'"
+ssh -o StrictHostKeyChecking=no -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "sudo bash -lc 'sed -e s#__DOMAIN__#${DOMAIN}#g -e s#__FRONTEND_ROOT__#${REMOTE_ROOT}/frontend#g -e s#__API_PORT__#${API_PORT}#g -e s#__SSL_CERT_PATH__#${SSL_CERT_PATH}#g -e s#__SSL_KEY_PATH__#${SSL_KEY_PATH}#g ${REMOTE_ROOT}/deploy/nginx.conf.template > /etc/nginx/sites-available/${SITE_NAME}.conf && ln -sf /etc/nginx/sites-available/${SITE_NAME}.conf /etc/nginx/sites-enabled/${SITE_NAME}.conf && nginx -t && (systemctl reload nginx || service nginx reload)'"
 
 if ($ENABLE_SSL -eq 'true') {
   Write-Host "[SSL] Requesting certificate..."
@@ -100,6 +102,6 @@ if ($ENABLE_SSL -eq 'true') {
 }
 
 Write-Host "[DB] Initializing database..."
-ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "REMOTE_ROOT='$REMOTE_ROOT' bash '$REMOTE_ROOT/deploy/db_init.sh'"
+ssh -o StrictHostKeyChecking=no -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" "REMOTE_ROOT='$REMOTE_ROOT' bash '$REMOTE_ROOT/deploy/db_init.sh'"
 
 Write-Host "[DEPLOY] Completed. Visit: http://$DOMAIN (or https if SSL enabled)"
