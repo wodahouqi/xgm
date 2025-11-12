@@ -4,9 +4,16 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import { traeBadgePlugin } from 'vite-plugin-trae-solo-badge';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   build: {
-    sourcemap: 'hidden',
+    sourcemap: false,
+    minify: 'esbuild',
+  },
+  resolve: {
+    conditions: mode === 'development' ? ['development', 'browser', 'module'] : ['production', 'browser', 'module'],
+  },
+  esbuild: {
+    legalComments: 'none',
   },
   server: {
     port: 5175,
@@ -26,13 +33,15 @@ export default defineConfig({
     }
   },
   plugins: [
-    react({
-      babel: {
-        plugins: [
-          'react-dev-locator',
-        ],
-      },
-    }),
+    react(
+      mode === 'development'
+        ? {
+            babel: {
+              plugins: ['react-dev-locator'],
+            },
+          }
+        : {}
+    ),
     traeBadgePlugin({
       variant: 'dark',
       position: 'bottom-right',
@@ -44,4 +53,4 @@ export default defineConfig({
     }), 
     tsconfigPaths()
   ],
-})
+}))
