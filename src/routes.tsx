@@ -1,39 +1,43 @@
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
 import { Toaster } from 'sonner'
 import Header from './components/Header'
-import Home from './pages/Home'
-import Artworks from './pages/Artworks'
-import ArtworkDetail from './pages/ArtworkDetail'
-import Artists from './pages/Artists'
-import ArtistDetail from './pages/ArtistDetail'
-import Booking from './pages/Booking'
-import UserCenter from './pages/UserCenter'
-import UserProfile from './pages/user/Profile'
-import UserFavorites from './pages/user/Favorites'
-import UserOrders from './pages/user/Orders'
-import UserAddresses from './pages/user/Addresses'
-import UserPayment from './pages/user/Payment'
-import UserNotifications from './pages/user/Notifications'
-import UserSettings from './pages/user/Settings'
-import ArtistDashboard from './pages/ArtistDashboard'
-import ArtistOverview from './pages/artist/Overview'
-import ArtistArtworks from './pages/artist/Artworks'
-import ArtistOrders from './pages/artist/Orders'
-import AdminDashboard from './pages/AdminDashboard'
-import AdminUsers from './pages/admin/Users'
-import AdminArtworks from './pages/admin/Artworks'
-import AdminOrders from './pages/admin/Orders'
-import AdminAnalytics from './pages/admin/Analytics'
-import AdminCategories from './pages/admin/Categories'
-import Login from './pages/Login'
-import Register from './pages/Register'
 import RequireRole from '@/components/RequireRole'
+
+const Home = lazy(() => import('./pages/Home'))
+const Artworks = lazy(() => import('./pages/Artworks'))
+const ArtworkDetail = lazy(() => import('./pages/ArtworkDetail'))
+const Artists = lazy(() => import('./pages/Artists'))
+const ArtistDetail = lazy(() => import('./pages/ArtistDetail'))
+const Booking = lazy(() => import('./pages/Booking'))
+const UserCenter = lazy(() => import('./pages/UserCenter'))
+const UserProfile = lazy(() => import('./pages/user/Profile'))
+const UserFavorites = lazy(() => import('./pages/user/Favorites'))
+const UserOrders = lazy(() => import('./pages/user/Orders'))
+const UserAddresses = lazy(() => import('./pages/user/Addresses'))
+const UserPayment = lazy(() => import('./pages/user/Payment'))
+const UserNotifications = lazy(() => import('./pages/user/Notifications'))
+const UserSettings = lazy(() => import('./pages/user/Settings'))
+const ArtistDashboard = lazy(() => import('./pages/ArtistDashboard'))
+const ArtistOverview = lazy(() => import('./pages/artist/Overview'))
+const ArtistArtworks = lazy(() => import('./pages/artist/Artworks'))
+const ArtistOrders = lazy(() => import('./pages/artist/Orders'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const AdminUsers = lazy(() => import('./pages/admin/Users'))
+const AdminArtworks = lazy(() => import('./pages/admin/Artworks'))
+const AdminOrders = lazy(() => import('./pages/admin/Orders'))
+const AdminAnalytics = lazy(() => import('./pages/admin/Analytics'))
+const AdminCategories = lazy(() => import('./pages/admin/Categories'))
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
 
 function Layout() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <Outlet />
+      <Suspense fallback={<div className="p-4">Loading...</div>}>
+        <Outlet />
+      </Suspense>
       <Toaster position="top-right" />
     </div>
   )

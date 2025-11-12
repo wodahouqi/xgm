@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => ({
     sourcemap: false,
     minify: 'esbuild',
     reportCompressedSize: false,
+    target: 'es2020',
   },
   resolve: {
     conditions: mode === 'development' ? ['development', 'browser', 'module'] : ['production', 'browser', 'module'],
