@@ -12,6 +12,6 @@ tar --exclude=node_modules --exclude=dist -czf - -C "$LOCAL_BACKEND_DIR" . \
 
 echo "[BACKEND] installing dependencies and building on remote..."
 ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-  "cd '$REMOTE_ROOT/api' && npm ci && npm run build"
+  "cd '$REMOTE_ROOT/api' && (command -v corepack >/dev/null 2>&1 && corepack enable && corepack prepare pnpm@8 --activate || true); if command -v pnpm >/dev/null 2>&1; then pnpm install --frozen-lockfile || pnpm install; pnpm run build; else npm install; npm run build; fi"
 
 echo "[BACKEND] done."

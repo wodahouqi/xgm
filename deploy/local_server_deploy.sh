@@ -36,8 +36,17 @@ if [ ! -f "$SSL_KEY_PATH" ]; then
 fi
 
 echo "[FRONTEND] installing deps and building..."
-npm ci || npm install
-npm run -s build
+if ! command -v pnpm >/dev/null 2>&1 && command -v corepack >/dev/null 2>&1; then
+  corepack enable >/dev/null 2>&1 || true
+  corepack prepare pnpm@8 --activate >/dev/null 2>&1 || true
+fi
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm install --frozen-lockfile || pnpm install
+  NODE_OPTIONS=--max-old-space-size=1024 pnpm run -s build
+else
+  npm install
+  NODE_OPTIONS=--max-old-space-size=1024 npm run -s build
+fi
 
 echo "[FRONTEND] syncing dist to $REMOTE_ROOT/frontend"
 sudo mkdir -p "$REMOTE_ROOT/frontend"
@@ -46,8 +55,17 @@ sudo cp -r "$REMOTE_ROOT/dist"/* "$REMOTE_ROOT/frontend/" || true
 
 echo "[BACKEND] installing deps and building..."
 cd "$REMOTE_ROOT/api"
-npm ci || npm install
-npm run -s build
+if ! command -v pnpm >/dev/null 2>&1 && command -v corepack >/dev/null 2>&1; then
+  corepack enable >/dev/null 2>&1 || true
+  corepack prepare pnpm@8 --activate >/dev/null 2>&1 || true
+fi
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm install --frozen-lockfile || pnpm install
+  pnpm run -s build
+else
+  npm install
+  npm run -s build
+fi
 
 echo "[BACKEND] writing .env"
 cat > "$REMOTE_ROOT/api/.env" <<EOF

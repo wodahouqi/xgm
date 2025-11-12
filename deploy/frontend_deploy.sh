@@ -5,7 +5,11 @@ set -euo pipefail
 # 需要以下环境变量：SSH_HOST SSH_PORT SSH_USER REMOTE_ROOT LOCAL_FRONTEND_BUILD_DIR
 
 echo "[FRONTEND] building locally..."
-npm run build
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm run build
+else
+  npm run build
+fi
 
 echo "[FRONTEND] uploading dist to remote..."
 tar -czf - -C "$LOCAL_FRONTEND_BUILD_DIR" . \
