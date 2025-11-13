@@ -559,7 +559,9 @@ export class ArtworkController {
         return sendError(res, 'Artwork not found', 404)
       }
 
-      await artworkRepository.remove(artwork)
+      artwork.isActive = false
+      artwork.status = ArtworkStatus.HIDDEN
+      await artworkRepository.save(artwork)
 
       return sendSuccess(res, null, 'Artwork deleted successfully')
     } catch (error) {
