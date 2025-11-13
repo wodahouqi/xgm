@@ -12,18 +12,18 @@ import { In, Like, MoreThan, LessThan, Between } from 'typeorm'
 export class ArtworkController {
   getAllArtworks = async (req: Request, res: Response) => {
     try {
-      const {
-        page = 1,
-        limit = 12,
-        category,
-        artist,
-        status,
+      const { 
+        page = 1, 
+        limit = 12, 
+        category, 
+        artist, 
+        status = ArtworkStatus.AVAILABLE,
         type,
         minPrice,
         maxPrice,
         sortBy = 'createdAt',
         sortOrder = 'DESC',
-        search
+        search 
       } = req.query
 
       if (!AppDataSource.isInitialized) {
@@ -138,7 +138,7 @@ export class ArtworkController {
         .where('artwork.isActive = :isActive', { isActive: true })
 
       // Apply filters
-      if (status && Object.values(ArtworkStatus).includes(status as ArtworkStatus)) {
+      if (status) {
         queryBuilder.andWhere('artwork.status = :status', { status })
       }
 

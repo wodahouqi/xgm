@@ -55,33 +55,33 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-  <section className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
-    <video
-      className="absolute inset-0 w-full h-full object-cover"
-      src="/head.mp4"
-      autoPlay
-      muted
-      loop
-      playsInline
-    />
-    <div className="absolute inset-0 bg-black/30" />
-    <div className="relative z-10 h-full flex items-center justify-center">
-      <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-        <Link
-          to="/artworks"
-          className="bg-white text-red-600 px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-red-50 transition-colors text-center"
-        >
-          浏览艺术品
-        </Link>
-        <Link
-          to="/artists"
-          className="border-2 border-white text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-red-600 transition-colors text-center"
-        >
-          发现艺术家
-        </Link>
-      </div>
-    </div>
-  </section>
+      <section className="relative h-64 sm:h-80 lg:h-96 bg-gradient-to-r from-red-600 to-red-800 overflow-hidden">
+        <div className="absolute inset-0 bg-black bg-opacity-30" />
+        <div className="relative z-10 h-full flex items-center justify-center text-center">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+              发现独特的艺术品
+            </h1>
+            <p className="text-lg sm:text-xl text-red-100 mb-6 sm:mb-8">
+              预订您喜爱的艺术品，支持原创艺术家
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+              <Link
+                to="/artworks"
+                className="bg-white text-red-600 px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-red-50 transition-colors text-center"
+              >
+                浏览艺术品
+              </Link>
+              <Link
+                to="/artists"
+                className="border-2 border-white text-white px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-red-600 transition-colors text-center"
+              >
+                发现艺术家
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Featured Artworks */}
       <section className="py-12 sm:py-16 bg-white">
